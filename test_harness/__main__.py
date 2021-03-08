@@ -2,12 +2,26 @@ from pathlib import Path
 import itertools
 from typing import Dict, List
 import logging
+import click
+
+
+@click.command()
+@click.argument("source", type=click.Path(exists=True, file_okay=True, dir_okay=False))
+def main(source):
+    print(f"parsing {source}...")
+    source = Path(source)
+    out = parse(source.read_text())
+
+    for key in out:
+        target = OUTDIR / f"{key}.txt"
+        print(f"emitting output file {target}")
+        target.write_text("\n".join(out[key]))
+
 
 TEST_START_MARKER = ">>>"
 
 END_OF_TEST_MARKER = "<<<"
 
-source = Path() / "hw2.txt"
 OUTDIR = Path() / "generated"
 
 if not OUTDIR.exists():
@@ -33,12 +47,5 @@ def parse(raw: str) -> Dict[str, List[str]]:
             break
 
     return data
-
-
-out = parse(source.read_text())
-
-
-for key in out:
-    target = OUTDIR / f"{key}.txt"
-    print(f"emitting output file {target}")
-    target.write_text("\n".join(out[key]))
+print("calling main...")
+main()

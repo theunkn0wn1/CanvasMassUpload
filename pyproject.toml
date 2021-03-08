@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "test_harness"
-version = "0.3.0"
+version = "0.4.1"
 description = ""
 authors = ["Joshua Salzedo <jsalzedo0@saddleback.edu>"]
 

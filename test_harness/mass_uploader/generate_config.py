@@ -72,7 +72,7 @@ def cli():
     output.write_text(toml.dumps(raw))
 
     logger.success(
-        f"Done! you can find the config file at {click.format_filename(str(output.resolve()))}"
+        f"Done! you can find the config file at {click.format_filename(str(output.absolute()))}"
     )
 
 
