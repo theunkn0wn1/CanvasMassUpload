@@ -1,0 +1,7 @@
+*.toml
+**/*.toml
+**/__pycache__/**
+.idea
+dist
+*.lock
+*.pyc

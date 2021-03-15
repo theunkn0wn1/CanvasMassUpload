@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "test_harness"
-version = "0.4.1"
+version = "0.4.2"
 description = ""
 authors = ["Joshua Salzedo <jsalzedo0@saddleback.edu>"]
 
@@ -17,6 +17,7 @@ click = "^7.1.2"
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
 ipython = "^7.19.0"
+black = "^20.8b1"
 
 [tool.poetry.scripts]
 gen_upload_config = "test_harness.mass_uploader.generate_config:cli"

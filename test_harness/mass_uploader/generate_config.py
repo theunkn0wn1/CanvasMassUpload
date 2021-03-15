@@ -27,14 +27,7 @@ def cli():
         "Please give me the url to a sample assignment",
         default="https://canvas.saddleback.edu/courses/45192/assignments/948561",
     )
-    parsed_uri = urlparse(course)
-    if not parsed_uri.scheme == "https":
-        logger.error("HTTPS is strictly enforced.")
-        raise click.Abort
-
-    base_uri = f"{parsed_uri.scheme}://{parsed_uri.hostname}"
-
-    _, _, course_id, _, assignment_id, *bits = parsed_uri.path.rstrip(r"/").split("/")
+    assignment_id, base_uri, bits, course_id = parse_url(course)
     if bits:
         logger.warning(f"unparsed bits of provided URI (this is probably an error) :: {bits!r}")
 
@@ -74,6 +67,16 @@ def cli():
     logger.success(
         f"Done! you can find the config file at {click.format_filename(str(output.absolute()))}"
     )
+
+
+def parse_url(course: str):
+    parsed_uri = urlparse(course.casefold())
+    if not parsed_uri.scheme == "https":
+        logger.error("HTTPS is strictly enforced.")
+        raise click.Abort
+    base_uri = f"{parsed_uri.scheme}://{parsed_uri.hostname}"
+    _, _, course_id, _, assignment_id, *bits = parsed_uri.path.rstrip(r"/").split("/")
+    return assignment_id, base_uri, bits, course_id
 
 
 if __name__ == "__main__":

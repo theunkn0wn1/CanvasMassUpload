@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, Optional
 
 from loguru import logger
 
@@ -7,6 +7,7 @@ from .config import load_config
 from .uploader import acquire_canvas_handle, mass_upload, submit_assignment, acquire_assignment
 import os
 import click
+from .generate_config import parse_url
 
 
 @click.command()
@@ -20,7 +21,9 @@ import click
 )
 @click.option("--course", type=int, default=None)
 @click.option("-assignment", type=int, default=None)
-def main(config, include: Tuple[os.PathLike], course: int, assignment: int):
+@click.option("--url", type=str, default=None)
+def main(config, include: Tuple[os.PathLike], course: Optional[int], assignment: Optional[int],
+         url: Optional[str]):
     cfg_path = Path(config)
     logger.info(f"include paths :== {include}")
 
@@ -41,6 +44,25 @@ def main(config, include: Tuple[os.PathLike], course: int, assignment: int):
 
     if assignment is not None:
         config.course.assignment_id = assignment
+
+    if url is not None:
+        # assignment ID was overridden
+        if course is not None or assignment is not None:
+            logger.warning(
+                "You specified a course/assignment id AND the assignment url. "
+                "Only the URL will be used."
+            )
+        logger.debug("parsing URL {!r}", url)
+        assignment_id, base_uri, bits, course_id = parse_url(url)
+        try:
+            config.course.id = int(course_id)
+            config.course.assignment_id = int(assignment_id)
+        except ValueError:
+            logger.exception("Failed to parse id ({!r}) or assignment ID(!r) as integers. ", course_id,
+                             assignment_id)
+            raise click.Abort("failed to parse IDs.")
+        if bits:
+            raise click.Abort("Unparsed tokens in URL. you provide me the right one?")
 
     if include:
         config.submission.include_paths = include
